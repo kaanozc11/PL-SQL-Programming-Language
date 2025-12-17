@@ -923,3 +923,198 @@ BEGIN
     END LOOP;
     CLOSE our_emps;
     END;
+
+
+
+DECLARE
+p_limit_sayisi number := 5;
+  CURSOR kaan IS
+    SELECT *
+    FROM (
+      SELECT e.employee_id, e.first_name, e.last_name, e.salary, d.department_name, b.bonus
+      FROM employees e 
+       JOIN departments d
+      ON d.department_id = e.department_id
+      JOIN locations l 
+      ON l.location_id = d.LOCATION_ID
+      JOIN countries c
+      ON c.country_id = l.country_id
+      JOIN regions r
+      ON r.region_id = c.region_id
+      JOIN bonuses b
+      ON b.employee_id = e.employee_id
+
+
+      
+
+      
+    ) 
+    
+    WHERE ROWNUM <= p_limit_sayisi;
+
+  enyuksekmaaslilar kaan%ROWTYPE;
+BEGIN
+  OPEN kaan;
+  LOOP
+    FETCH kaan INTO  enyuksekmaaslilar;
+  EXIT WHEN kaan%NOTFOUND;
+  DBMS_OUTPUT.PUT_LINE(
+      'En çok maaş alan 5 kişi: ' ||
+      enyuksekmaaslilar.employee_id || ' - ' ||
+      enyuksekmaaslilar.first_name || ' ' ||
+      enyuksekmaaslilar.last_name || ' - ' ||
+      enyuksekmaaslilar.salary || ' - ' ||
+      enyuksekmaaslilar.department_name || ' - ' ||
+      (enyuksekmaaslilar.salary + enyuksekmaaslilar.bonus)
+    );
+  
+
+END LOOP;
+CLOSE kaan;
+
+END;
+
+DECLARE
+p_limit_sayisi number := 5;
+region_Adi VARCHAR(100) := '&region_Adi';
+  CURSOR kaan IS
+    SELECT *
+    FROM (
+      SELECT e.employee_id, e.first_name, e.last_name, e.salary, d.department_name, b.bonus
+      FROM employees e 
+       JOIN departments d
+      ON d.department_id = e.department_id
+      JOIN locations l 
+      ON l.location_id = d.LOCATION_ID
+      JOIN countries c
+      ON c.country_id = l.country_id
+      JOIN regions r
+      ON r.region_id = c.region_id
+      JOIN bonuses b
+      ON b.employee_id = e.employee_id
+
+
+      
+   WHERE r.region_name = LOWER(region_Adi) 
+      
+    ) 
+    
+    WHERE ROWNUM <= p_limit_sayisi;
+
+  enyuksekmaaslilar kaan%ROWTYPE;
+BEGIN
+  OPEN kaan;
+  LOOP
+    FETCH kaan INTO  enyuksekmaaslilar;
+  EXIT WHEN kaan%NOTFOUND;
+  DBMS_OUTPUT.PUT_LINE(
+      'En çok maaş alan 5 kişi: ' ||
+      enyuksekmaaslilar.employee_id || ' - ' ||
+      enyuksekmaaslilar.first_name || ' ' ||
+      enyuksekmaaslilar.last_name || ' - ' ||
+      enyuksekmaaslilar.salary || ' - ' ||
+      enyuksekmaaslilar.department_name || ' - ' ||
+      (enyuksekmaaslilar.salary + enyuksekmaaslilar.bonus)
+    );
+  
+
+END LOOP;
+CLOSE kaan;
+
+END;
+
+DECLARE
+v_country_id countries.COUNTRY_ID%TYPE;
+BEGIN
+  SELECT country_id INTO v_country_id FROM Countries
+  WHERE country_name = 'Türkiye';
+  
+
+  EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+  DBMS_OUTPUT.PUT_LINE('Böyle bir ülke yok !');
+  
+  
+  WHEN OTHERS THEN
+  DBMS_OUTPUT.PUT_LINE('Olmaması gereken şeyler oldu');
+  END;
+
+
+  DECLARE
+v_country_id countries.COUNTRY_ID%TYPE;
+BEGIN
+  SELECT country_id INTO v_country_id FROM Countries
+  WHERE country_name = 'Türkiye';
+  
+
+  EXCEPTION
+
+  WHEN OTHERS THEN
+  DBMS_OUTPUT.PUT_LINE('Olmaması gereken şeyler oldu');
+  
+  WHEN NO_DATA_FOUND THEN
+  DBMS_OUTPUT.PUT_LINE('Böyle bir ülke yok !');
+ 
+  END;
+
+
+  DECLARE
+v_country_id countries.COUNTRY_ID%TYPE;
+v_country_name countries.country_name%TYPE;
+BEGIN
+  SELECT  country_name INTO v_country_name FROM Countries
+  WHERE country_id > 10;
+  dbms_output.put_line(country_name);
+
+  EXCEPTION
+
+
+  
+  WHEN NO_DATA_FOUND THEN
+  DBMS_OUTPUT.PUT_LINE('Böyle bir ülke yok !');
+
+  WHEN OTHERS THEN
+  DBMS_OUTPUT.PUT_LINE('Olmaması gereken şeyler oldu');
+  
+  
+  
+  END;
+
+DECLARE
+v_country_name countries.country_name%TYPE;
+BEGIN
+  SELECT country_name INTO v_country_name FROM countries
+  where UPPER(country_id) LIKE UPPER('%A%');
+  dbms_output.put_line(v_country_name);
+  EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+  dbms_output.put_line('Böyle bir ülke yok');
+  WHEN TOO_MANY_ROWS THEN
+  dbms_output.put_line('çok sayıda ülke döndü');
+  WHEN OTHERS THEN
+  dbms_output.put_line('bilinmeyen bir hata');
+  END;
+
+  DECLARE
+  v_mgr PLS_INTEGER :=123;
+  BEGIN
+    DELETE FROM EMPLOYEES
+    WHERE manager_id = v_mgr;
+    IF SQL%NOTFOUND THEN
+    RAISE_APPLICATION_ERROR(-20202, 'This is invalid');
+    END IF;
+    dbms_output.put_line('bu satır çalışmaz');
+    END;
+
+
+  DECLARE
+  e_positive_number EXCEPTION;
+  sayi NUMBER := &sayi;
+  BEGIN
+    IF sayi > 0 THEN
+    e_positive_number;
+    END IF;
+    EXCEPTION
+    WHEN e_positive_number THEN
+    dbms_output.put_line('Sayi pozitif olamaz');
+    END;
