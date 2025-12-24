@@ -1118,3 +1118,162 @@ BEGIN
     WHEN e_positive_number THEN
     dbms_output.put_line('Sayi pozitif olamaz');
     END;
+
+
+ CREATE OR REPLACE PROCEDURE topla (num1 OUT NUMBER,num2 OUT NUMBER) IS
+ toplam NUMBER; 
+ BEGIN
+toplam := num1 + num2;
+
+  END topla; 
+
+DECLARE
+toplam NUMBER;
+  BEGIN
+
+topla(10,5, toplam);
+dbms_output.put_line(toplam);
+
+  END ;  
+
+
+
+
+CREATE OR REPLACE PROCEDURE dondur(
+  p_department_id   IN  DEPARTMENTS.DEPARTMENT_ID%TYPE,
+  p_department_name OUT DEPARTMENTS.DEPARTMENT_NAME%TYPE
+) IS
+BEGIN
+  SELECT department_name INTO p_department_name FROM departments
+  WHERE department_id = p_department_id;
+END dondur;
+/
+
+DECLARE
+  v_dept_name DEPARTMENTS.DEPARTMENT_NAME%TYPE;
+BEGIN
+FOR SAYAC IN 10..27 Loop 
+dondur(p_department_id => SAYAC*10, p_department_name => v_dept_name);
+dbms_output.put_line(v_dept_name);
+
+END LOOP;
+
+  /*dondur(SAYAC*10, v_dept_name);
+  dbms_output.put_line(v_dept_name); */
+
+  
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE format_phone
+(p_phone_no IN OUT VARCHAR2) IS
+BEGIN
+p_phone_no := '(' || SUBSTR(p_phone_no, 1, 3) ||
+')' || SUBSTR(p_phone_no, 4, 3) ||
+'-' || SUBSTR(p_phone_no, 7);
+END format_phone;
+
+DECLARE
+a_phone_no VARCHAR2(13);
+BEGIN
+a_phone_no := '8006330575' ;
+format_phone(a_phone_no);
+DBMS_OUTPUT.PUT_LINE('The formatted number is: ' || a_phone_no);
+END;
+
+
+CREATE OR REPLACE PROCEDURE topla_default(
+  p_num1   IN  NUMBER DEFAULT 0,
+  p_num2   IN  NUMBER DEFAULT 0,
+  p_toplam OUT NUMBER
+) IS
+BEGIN
+  p_toplam := p_num1 + p_num2;
+END;
+/
+
+
+DECLARE
+  num1 NUMBER;
+  num2 NUMBER := 3;
+  toplam NUMBER;
+BEGIN
+  topla_default(num1, num2, toplam);
+  dbms_output.put_line(toplam);
+END;
+/
+
+CREATE OR REPLACE PROCEDURE topla_default(sayi1 NUMBER := 0, sayi2 NUMBER DEFAULT 0, toplam OUT NUMBER) IS
+BEGIN
+  toplam:= sayi1+sayi2;
+  END topla_default;
+/
+  DECLARE
+  v_toplam NUMBER :=0;
+  BEGIN
+    topla_default(sayi1 => 45, toplam => v_toplam);
+    dbms_output.put_line(v_toplam);
+
+     topla_default(sayi2 => 25,toplam => v_toplam);
+    dbms_output.put_line(v_toplam);
+
+topla_default(sayi2 => 25,toplam => v_toplam, sayi1 => 20);
+    dbms_output.put_line(v_toplam);
+
+    END;
+    /
+
+
+
+
+
+
+
+CREATE OR REPLACE PROCEDURE topla_dondurmez(sayi1 NUMBER := 0, sayi2 NUMBER DEFAULT 0) IS
+BEGIN
+  dbms_output.put_line(sayi1+sayi2);
+  END topla_dondurmez;
+/
+BEGIN
+  topla_dondurmez(15,25);
+  END;
+/
+
+
+CREATE OR REPLACE FUNCTION get_sal
+(p_id IN employees.employee_id%TYPE)
+RETURN NUMBER IS
+v_sal employees.salary%TYPE := 0;
+BEGIN
+SELECT salary
+INTO v_sal
+FROM employees
+WHERE employee_id = p_id;
+RETURN v_sal;
+END get_sal;
+/
+DECLARE
+  v_salary NUMBER;
+BEGIN
+  v_salary := get_sal(100);
+  dbms_output.put_line(v_salary);
+END;
+
+select get_sal(100);
+/
+
+
+
+CREATE OR REPLACE FUNCTION maas_farki
+(p_min_salary IN JOBS.MIN_SALARY%TYPE,
+ p_max_salary IN JOBS.MAX_SALARY%TYPE,
+ p_fark OUT NUMBER
+ )
+ RETURN NUMBER IS
+ p_fark := p_max_salary - p_min_salary;
+ BEGIN
+SELECT MAX_SALARY, MIN_SALARY FROM JOBS
+  END maas_farki;
+/
+
