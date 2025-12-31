@@ -1264,7 +1264,7 @@ select get_sal(100);
 /
 
 
-
+/*
 CREATE OR REPLACE FUNCTION maas_farki
 (p_min_salary IN JOBS.MIN_SALARY%TYPE,
  p_max_salary IN JOBS.MAX_SALARY%TYPE,
@@ -1275,5 +1275,24 @@ CREATE OR REPLACE FUNCTION maas_farki
  BEGIN
 SELECT MAX_SALARY, MIN_SALARY FROM JOBS
   END maas_farki;
-/
+/*/
 
+
+
+CREATE TABLE HR.LOG_TABLE2
+(
+  USER_ID    NUMBER(6,0) NOT NULL,
+  LOGON_DATE DATE        NOT NULL
+)
+TABLESPACE USERS;
+
+
+CREATE OR REPLACE TRIGGER log_sal_change_trigg
+AFTER UPDATE OF salary ON employees
+BEGIN
+INSERT INTO log_table (user_id, logon_date)
+VALUES (USER, SYSDATE);
+END;
+
+  UPDATE employees
+  SET salary = 18000 WHERE EMPLOYEE_ID = 101; 
