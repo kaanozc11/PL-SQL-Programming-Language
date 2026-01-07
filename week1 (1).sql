@@ -1296,3 +1296,102 @@ END;
 
   UPDATE employees
   SET salary = 18000 WHERE EMPLOYEE_ID = 101; 
+
+
+
+
+
+--- Too Many Rows Exception
+DECLARE
+v_lname VARCHAR2(15);
+BEGIN
+SELECT last_name INTO v_lname
+FROM employees WHERE job_id = 'ST_CLERK';
+DBMS_OUTPUT.PUT_LINE('The last name of the ST_CLERK is: ' || v_lname);
+EXCEPTION
+WHEN TOO_MANY_ROWS THEN
+DBMS_OUTPUT.PUT_LINE ('Your select statement retrieved multiple
+
+rows. Consider using a cursor.');
+
+END;
+
+--- Non-Predefined Exception
+DECLARE
+e_insert_excep EXCEPTION;
+PRAGMA EXCEPTION_INIT(e_insert_excep, -01400);
+BEGIN
+INSERT INTO departments
+(department_id, department_name)
+VALUES (280, NULL);
+EXCEPTION
+WHEN e_insert_excep
+THEN
+DBMS_OUTPUT.PUT_LINE('INSERT FAILED');
+END;
+
+--- Procedure Exammple
+CREATE OR REPLACE PROCEDURE add_dept IS
+v_dept_id dept.department_id%TYPE;
+v_dept_name dept.department_name%TYPE;
+BEGIN
+v_dept_id := 280;
+v_dept_name := 'ST-Curriculum';
+INSERT INTO dept(department_id, department_name)
+VALUES(v_dept_id, v_dept_name);
+DBMS_OUTPUT.PUT_LINE('Inserted '|| SQL%ROWCOUNT || '
+row.');
+END;
+
+--- Procedures with Parameters
+CREATE OR REPLACE PROCEDURE raise_salary
+(p_id IN my_employees.employee_id%TYPE,
+p_percent IN NUMBER)
+IS
+BEGIN
+UPDATE my_employees
+SET salary = salary * (1 + p_percent/100)
+WHERE employee_id = p_id;
+END raise_salary;
+
+BEGIN raise_salary(176, 10); END;
+
+
+--Function Example
+CREATE OR REPLACE FUNCTION get_sal
+(p_id IN employees.employee_id%TYPE) RETURN NUMBER IS
+v_sal employees.salary%TYPE := 0;
+BEGIN
+SELECT salary INTO v_sal
+FROM employees WHERE employee_id = p_id;
+RETURN v_sal;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN RETURN NULL;
+END get_sal;
+
+--Another Function Example
+CREATE OR REPLACE FUNCTION valid_dept
+(p_dept_no departments.department_id%TYPE)
+RETURN BOOLEAN IS v_valid VARCHAR2(1);
+BEGIN
+SELECT 'x' INTO v_valid
+FROM departments
+WHERE department_id = p_dept_no;
+RETURN(true);
+EXCEPTION
+WHEN NO_DATA_FOUND THEN RETURN(false);
+WHEN OTHERS THEN NULL;
+END;
+
+--Procedures with Cursors
+CREATE OR REPLACE PROCEDURE process_employees
+IS
+CURSOR emp_cursor IS
+SELECT employee_id
+FROM my_employees;
+BEGIN
+FOR v_emp_rec IN emp_cursor
+LOOP
+raise_salary(v_emp_rec.employee_id, 10);
+END LOOP;
+END process_employees;
